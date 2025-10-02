@@ -1,0 +1,29 @@
+{
+  "name": "lesson-31-homework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KarimjonovaMukhtasar/LESSON-31-POSTGRESQL-AND-ITS-CONNECTION-TO-API-SERVER-VIA-EXPRESS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/KarimjonovaMukhtasar/LESSON-31-POSTGRESQL-AND-ITS-CONNECTION-TO-API-SERVER-VIA-EXPRESS/issues"
+  },
+  "homepage": "https://github.com/KarimjonovaMukhtasar/LESSON-31-POSTGRESQL-AND-ITS-CONNECTION-TO-API-SERVER-VIA-EXPRESS#readme",
+  "dependencies": {
+    "env": "^0.0.2",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1",
+    "pg": "^8.16.3"
+  }
+}
