@@ -5,7 +5,7 @@ CommentsRouter.get("/search", filterAll)
 CommentsRouter.get("/", findAll)
 CommentsRouter.get("/:id", findOne)
 CommentsRouter.post("/",createOne)
-CommentsRouter.put("/:id", updateOne)
+CommentsRouter.put("/:id/:post_id", updateOne)
 CommentsRouter.delete("/:id", deleteOne)
 
 

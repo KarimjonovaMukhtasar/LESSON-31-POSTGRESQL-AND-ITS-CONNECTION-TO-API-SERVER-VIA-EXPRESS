@@ -39,7 +39,8 @@ const findOne = async (req, res) => {
 const updateOne = async (req, res) => {
     try {
         const { id } = req.params
-        const { content, post_id, user_id } = req.body
+        const {post_id} = req.params
+        const { content} = req.body
         const fields = []
         const values = []
         const commentId = await client.query(`Select * from comments where id = $1`, [id])
@@ -47,13 +48,6 @@ const updateOne = async (req, res) => {
             return res.status(404).json({
                 message: `Not found such a comment Id!`,
                 id: id
-            })
-        }
-        const userId = await client.query(`Select * from users where id = $1`, [user_id])
-        if (userId.rows.length === 0) {
-            return res.status(404).json({
-                message: `Not found such a user Id!`,
-                id: user_id
             })
         }
         const postId = await client.query(`Select * from posts where id = $1`, [post_id])
@@ -128,12 +122,12 @@ const createOne = async (req, res) => {
 const deleteOne = async (req, res) => {
     try {
         const { id } = req.params
-        const query = `Delete from comments where id = $1`
+        const query = `Delete from comments where id = $1 returning *`
         const deletedComment = await client.query(query, [id])
-         if (deletedComment.rows.length === 0) {
-            return res.status(200).json({ message: `Successfully deleted a comment!`, user: deletedComment.rows[0] })
+        if (deletedComment.rows.length === 0) {
+            return res.status(400).json({ message: `Not found such an id of a comment` })
         }
-         return res.status(400).json({message: `Not found such an id of a comment`})
+        return res.status(200).json({ message: `Successfully deleted a comment!`, user: deletedComment.rows[0] })
     } catch (error) {
         console.log(error)
         return res.status(501).json({ message: `ERROR IN THE SERVER` })

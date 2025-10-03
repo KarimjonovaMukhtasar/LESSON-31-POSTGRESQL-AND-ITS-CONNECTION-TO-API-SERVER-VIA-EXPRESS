@@ -116,12 +116,12 @@ const createOne = async (req, res) => {
 const deleteOne = async (req, res) => {
     try {
         const { id } = req.params
-        const query = `Delete from users where id = $1`
+        const query = `Delete from users where id = $1 returning *`
         const deletedUser = await client.query(query, [id])
         if (deletedUser.rows.length === 0) {
-            return res.status(200).json({ message: `Successfully deleted a user!`, user: deletedUser.rows[0] })
+            return res.status(400).json({ message: `Not found such an id of a user` })
         }
-        return res.status(400).json({message: `Not found such an id of a user`})
+        return res.status(200).json({ message: `Successfully deleted a user!`, user: deletedUser.rows[0] })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: `ERROR IN THE SERVER` })

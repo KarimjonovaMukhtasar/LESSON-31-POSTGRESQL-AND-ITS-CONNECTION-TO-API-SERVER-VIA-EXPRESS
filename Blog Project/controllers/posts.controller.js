@@ -25,7 +25,7 @@ const findOne = async (req, res) => {
             return res.status(404).json({ message: `Not found such an id ${id}!` })
         }
         return res.status(200).json({
-            message: `Successfully retrieved data ${id} numberes`,
+            message: `Successfully retrieved data ${id} numbered`,
             post: searchedId.rows[0]
         })
     } catch (error) {
@@ -39,7 +39,8 @@ const findOne = async (req, res) => {
 const updateOne = async (req, res) => {
     try {
         const { id } = req.params
-        const { title, content, slug, user_id } = req.body
+        const {user_id} = req.params
+        const { title, content, slug} = req.body
         const fields = []
         const values = []
         const userId = await client.query(`Select * from users where id = $1`, [user_id])
@@ -87,6 +88,13 @@ const createOne = async (req, res) => {
     try {
         const { title, content, slug, user_id } = req.body
         if (title && content && slug && user_id) {
+            const userId = await client.query(`Select * from users where id = $1`, [user_id])
+            if (userId.rows.length === 0) {
+                return res.status(404).json({
+                    message: `Not found such a user Id!`,
+                    id: user_id
+                })
+            }
             const body = [title, content, slug, user_id]
             const query = `Insert into posts (title, content, slug, user_id) values ($1,$2, $3, $4) returning *`
             const newPost = await client.query(query, body)
@@ -107,12 +115,12 @@ const createOne = async (req, res) => {
 const deleteOne = async (req, res) => {
     try {
         const { id } = req.params
-        const query = `Delete from posts where id = $1`
+        const query = `Delete from posts where id = $1 returning *`
         const deletedPost = await client.query(query, [id])
-         if (deletedPost.rows.length === 0) {
-            return res.status(200).json({ message: `Successfully deleted a post!`, post: deletedPost.rows[0] })
+        if (deletedPost.rows.length === 0) {
+            return res.status(404).json({ message: `Not found such an id of a post` })
         }
-         return res.status(400).json({message: `Not found such an id of a post`})
+        return res.status(200).json({ message: `Successfully deleted a post!`, post: deletedPost.rows[0] })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: `ERROR IN THE SERVER` })

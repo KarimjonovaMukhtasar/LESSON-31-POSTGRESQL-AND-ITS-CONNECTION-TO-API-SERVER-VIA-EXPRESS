@@ -5,7 +5,7 @@ PostsRouter.get("/search", filterAll)
 PostsRouter.get("/", findAll)
 PostsRouter.get("/:id", findOne)
 PostsRouter.post("/",createOne)
-PostsRouter.put("/:id", updateOne)
+PostsRouter.put("/:id/:user_id", updateOne)
 PostsRouter.delete("/:id", deleteOne)
 
 
