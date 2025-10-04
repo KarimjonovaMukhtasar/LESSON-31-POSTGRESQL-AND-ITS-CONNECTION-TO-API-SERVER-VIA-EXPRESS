@@ -1,7 +1,7 @@
 import { client } from "../config/db.js"
 const findAll = async (req, res) => {
     try {
-        const query = `Select * from comments returning *`
+        const query = `Select * from comments`
         const comments = await client.query(query)
         console.log(comments.rows)
         return res.status(200).json({
@@ -19,7 +19,7 @@ const findAll = async (req, res) => {
 const findOne = async (req, res) => {
     try {
         const { id } = req.params
-        const query = `Select * from comments where id = $1 returning *`
+        const query = `Select * from comments where id = $1`
         const comment = await client.query(query, [id])
         if (comment.rows.length === 0) {
             return res.status(404).json(`Not found such an id of a commment!`)
@@ -38,15 +38,18 @@ const findOne = async (req, res) => {
 }
 const createOne = async (req, res) => {
     try {
-        const { text, rating, userId } = req.body
-        if (text && rating && userId) {
-            const user = await client.query(`Select * from users where id = $1 returning *`, [userId])
+        const { text, rating, user_id } = req.body
+        if (text && rating && user_id) {
+            const user = await client.query(`Select * from users where id = $1`, [user_id])
             if (user.rows.length === 0) {
                 return res.status(404).json({ message: `NOT FOUND SUCH AN ID OF A USER!` })
             }
-            const values = [text, rating, userId]
-            const query = `Insert into comments (text, rating, userId) VALUES ($1,$2,$3) returning *`
+            const values = [text, rating, user_id]
+            const query = `Insert into comments (text, rating, user_id) VALUES ($1,$2,$3) returning *`
             const newComment = await client.query(query, values)
+            return res.status(201).json({message: `SUCCESSFULLY CREATED A NEW COMMENT!`,
+                comment: newComment.rows[0]
+            })
         }
         else {
             return res.status(401).json({ message: `FILL THE COMMENT PROPERTIES FULLY!` })
@@ -61,27 +64,30 @@ const createOne = async (req, res) => {
 }
 const updateOne = async (req, res) => {
     try {
-        const [text, rating, userId] = req.body
+        const { text, rating } = req.body
         const { id } = req.params
-        const {user_id} = req.params
-        const commentId = await client.query(`Select * from comments where id = $1 returning *`, [id])
+        const { user_id } = req.params
+        const commentId = await client.query(`Select * from comments where id = $1`, [id])
         if (commentId.rows.length === 0) {
             return res.status(404).json({ message: `NOT FOUND SUCH AN ID OF A COMMENT!` })
+        }
+        const userid = await client.query(`Select * from users where id = $1`, [user_id])
+        if (userid.rows.length === 0) {
+            return res.status(404).json(`NOT FOUND SUCH AN ID OF A USER, CHECK THE SPELLING!`)
         }
         const fields = []
         const values = []
         if (text) {
-            fields.push(`text=${fields.length + 1}`)
+            fields.push(`text = $${fields.length + 1}`)
             values.push(text)
         }
         if (rating) {
-            fields.push(`rating = ${fields.length + 1}`)
+            fields.push(`rating = $${fields.length + 1}`)
             values.push(rating)
         }
-        const userid = await client.query(`Select * from users where id = $1`, [user_id])
-            if (userid.rows.length === 0) {
-                return res.status(404).json(`NOT FOUND SUCH AN ID OF A USER, CHECK THE SPELLING!`)
-            }
+        if (fields.length === 0) {
+            return res.status(400).json({ message: "No fields provided to update." });
+        }
         values.push(id)
         const query = `Update comments Set ${fields.join(", ")} where id = $${values.length} returning *`
         const updatedComment = await client.query(query, values)
@@ -99,13 +105,13 @@ const updateOne = async (req, res) => {
 }
 const deleteOne = async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         const query = `Delete from comments where id = $1 returning *`
         const deletedComment = await client.query(query, [id])
-        if(deletedComment.rows.length === 0){
-            return res.status(404).json({message: `NOT FOUND SUCH AN ID OF A COMMENT!`})
+        if (deletedComment.rows.length === 0) {
+            return res.status(404).json({ message: `NOT FOUND SUCH AN ID OF A COMMENT!` })
         }
-        return res.status(200).json({message: `Successfully Deleted a Comment!`})
+        return res.status(200).json({ message: `Successfully Deleted a Comment!` })
     } catch (error) {
         console.log(error)
         return res.status(500).json({
@@ -115,4 +121,4 @@ const deleteOne = async (req, res) => {
     }
 }
 
-export {findAll, findOne, createOne, updateOne, deleteOne}
+export { findAll, findOne, createOne, updateOne, deleteOne }

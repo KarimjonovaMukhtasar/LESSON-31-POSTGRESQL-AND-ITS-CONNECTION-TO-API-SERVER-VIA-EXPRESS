@@ -10,4 +10,6 @@ create table users(id serial primary key,
 create table comments(id serial primary key,
         text varchar(200),
         rating int,
-        userId int REFERENCES users(id));
+        user_id int REFERENCES users(id) on delete cascade);
+
+

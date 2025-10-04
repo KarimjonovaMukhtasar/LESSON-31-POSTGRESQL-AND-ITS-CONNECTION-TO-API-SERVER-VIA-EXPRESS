@@ -5,7 +5,7 @@ const UsersRouter = Router()
 UsersRouter.get("/", findAll)
 UsersRouter.get("/:id", findOne)
 UsersRouter.post("/", createOne)
-UsersRouter.patch("/:id", updateOne)
+UsersRouter.patch("/:id/:user_id", updateOne)
 UsersRouter.delete("/:id", deleteOne)
 
 export {UsersRouter}
